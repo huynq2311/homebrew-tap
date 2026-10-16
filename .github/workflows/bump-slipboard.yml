@@ -1,0 +1,68 @@
+name: Bump SlipBoard
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: bump-slipboard
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Open a pull request for a new release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          CASK=Casks/slipboard.rb
+
+          TAG="$(gh api repos/huynq2311/SlipBoard/releases/latest --jq .tag_name)"
+          # The tag ends up in a Ruby file and a branch name; accept only v<version>-<build>.
+          if ! [[ "$TAG" =~ ^v[0-9]+(\.[0-9]+)*-[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "Unexpected tag format: $TAG" >&2
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          CURRENT="$(sed -n 's/^  version "\(.*\)"$/\1/p' "$CASK")"
+          if [ "$VERSION" = "$CURRENT" ]; then
+            echo "Cask already at $VERSION."
+            exit 0
+          fi
+
+          BRANCH="bump-slipboard-$VERSION"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            echo "Branch $BRANCH already exists."
+            exit 0
+          fi
+
+          BASE="https://github.com/huynq2311/SlipBoard/releases/download/$TAG"
+          curl -fsSL -o SlipBoard.dmg "$BASE/SlipBoard.dmg"
+          curl -fsSL -o SlipBoard.dmg.sha256 "$BASE/SlipBoard.dmg.sha256"
+          sha256sum -c SlipBoard.dmg.sha256
+          SHA="$(sha256sum SlipBoard.dmg | cut -d' ' -f1)"
+          rm SlipBoard.dmg SlipBoard.dmg.sha256
+
+          sed -i \
+            -e "s/^  version \".*\"$/  version \"$VERSION\"/" \
+            -e "s/^  sha256 \".*\"$/  sha256 \"$SHA\"/" \
+            "$CASK"
+          grep -qx "  version \"$VERSION\"" "$CASK" && grep -qx "  sha256 \"$SHA\"" "$CASK" \
+            || { echo "Unexpected cask format" >&2; exit 1; }
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git commit -am "slipboard $VERSION"
+          git push origin "$BRANCH"
+          gh pr create --title "slipboard $VERSION" --body "Release: https://github.com/huynq2311/SlipBoard/releases/tag/$TAG
+
+          SHA-256 checked against the release's \`SlipBoard.dmg.sha256\`. Install it with \`brew install --cask ./Casks/slipboard.rb\` from this branch before merging."
