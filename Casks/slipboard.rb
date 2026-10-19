@@ -1,6 +1,6 @@
 cask "slipboard" do
-  version "1.0-20261019"
-  sha256 "0789191e4ed7ab04d3e027ddf891e9ecd6978b700bc515d010dd69f866938bbd"
+  version "1.0-20261019.1"
+  sha256 "2c3b48a445c990d2a06ea1672a549a75f5e66e92ec1e0c47d14108a6b163e20b"
 
   url "https://github.com/huynq2311/SlipBoard/releases/download/v#{version}/SlipBoard.dmg"
   name "SlipBoard"
