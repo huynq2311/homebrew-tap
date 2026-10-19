@@ -66,3 +66,4 @@ jobs:
           gh pr create --title "slipboard $VERSION" --body "Release: https://github.com/huynq2311/SlipBoard/releases/tag/$TAG
 
           SHA-256 checked against the release's \`SlipBoard.dmg.sha256\`. Install it with \`brew install --cask ./Casks/slipboard.rb\` from this branch before merging."
+          gh pr merge "$BRANCH" --squash --delete-branch
