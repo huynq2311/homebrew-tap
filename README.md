@@ -19,4 +19,4 @@ SlipTray is signed with a self-signed certificate and is not notarized. macOS bl
 
 ## Maintenance
 
-`.github/workflows/bump-slipboard.yml` checks the latest SlipTray release every six hours (or on demand from the Actions tab). When the release tag differs from the cask version it downloads `SlipTray.dmg`, checks it against the release's `SlipTray.dmg.sha256`, and opens a pull request that updates `version` and `sha256`. Review and merge it by hand.
+`.github/workflows/bump-slipboard.yml` checks the latest SlipTray release every six hours (or on demand from the Actions tab). When the release tag differs from the cask version it downloads `SlipTray.dmg`, checks it against the release's `SlipTray.dmg.sha256`, and opens a pull request that updates `version` and `sha256`, then squash-merges it.
