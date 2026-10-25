@@ -1,4 +1,4 @@
-name: Bump SlipBoard
+name: Bump SlipTray
 
 on:
   schedule:
@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: bump-slipboard
+  group: bump-sliptray
 
 jobs:
   bump:
@@ -23,9 +23,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          CASK=Casks/slipboard.rb
+          CASK=Casks/sliptray.rb
 
-          TAG="$(gh api repos/huynq2311/SlipBoard/releases/latest --jq .tag_name)"
+          TAG="$(gh api repos/huynq2311/SlipTray/releases/latest --jq .tag_name)"
           # The tag ends up in a Ruby file and a branch name; accept only v<version>-<build>.
           if ! [[ "$TAG" =~ ^v[0-9]+(\.[0-9]+)*-[0-9]+(\.[0-9]+)*$ ]]; then
             echo "Unexpected tag format: $TAG" >&2
@@ -38,18 +38,18 @@ jobs:
             exit 0
           fi
 
-          BRANCH="bump-slipboard-$VERSION"
+          BRANCH="bump-sliptray-$VERSION"
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
             echo "Branch $BRANCH already exists."
             exit 0
           fi
 
-          BASE="https://github.com/huynq2311/SlipBoard/releases/download/$TAG"
-          curl -fsSL -o SlipBoard.dmg "$BASE/SlipBoard.dmg"
-          curl -fsSL -o SlipBoard.dmg.sha256 "$BASE/SlipBoard.dmg.sha256"
-          sha256sum -c SlipBoard.dmg.sha256
-          SHA="$(sha256sum SlipBoard.dmg | cut -d' ' -f1)"
-          rm SlipBoard.dmg SlipBoard.dmg.sha256
+          BASE="https://github.com/huynq2311/SlipTray/releases/download/$TAG"
+          curl -fsSL -o SlipTray.dmg "$BASE/SlipTray.dmg"
+          curl -fsSL -o SlipTray.dmg.sha256 "$BASE/SlipTray.dmg.sha256"
+          sha256sum -c SlipTray.dmg.sha256
+          SHA="$(sha256sum SlipTray.dmg | cut -d' ' -f1)"
+          rm SlipTray.dmg SlipTray.dmg.sha256
 
           sed -i \
             -e "s/^  version \".*\"$/  version \"$VERSION\"/" \
@@ -61,9 +61,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$BRANCH"
-          git commit -am "slipboard $VERSION"
+          git commit -am "sliptray $VERSION"
           git push origin "$BRANCH"
-          gh pr create --title "slipboard $VERSION" --body "Release: https://github.com/huynq2311/SlipBoard/releases/tag/$TAG
+          gh pr create --title "sliptray $VERSION" --body "Release: https://github.com/huynq2311/SlipTray/releases/tag/$TAG
 
-          SHA-256 checked against the release's \`SlipBoard.dmg.sha256\`. Install it with \`brew install --cask ./Casks/slipboard.rb\` from this branch before merging."
+          SHA-256 checked against the release's \`SlipTray.dmg.sha256\`. Install it with \`brew install --cask ./Casks/sliptray.rb\` from this branch before merging."
           gh pr merge "$BRANCH" --squash --delete-branch
