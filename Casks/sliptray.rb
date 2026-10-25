@@ -1,6 +1,6 @@
 cask "sliptray" do
-  version "1.0-20261024"
-  sha256 "d3263ce7ffaa851acfe9690c9d1a4262febd7fd7cfe6494cff9451baf46b1585"
+  version "1.0-20261025"
+  sha256 "2700109cd6c6304379fa46845bdf8e96decd5dee1e69bfd8d5be6e509c1dc07b"
 
   url "https://github.com/huynq2311/SlipTray/releases/download/v#{version}/SlipTray.dmg"
   name "SlipTray"
